@@ -14,7 +14,12 @@
 
 
     <h2> 내가 한 말 : {{ transcript }}  </h2>
-   
+
+       {% if cheat == 1 %}
+        <div id="cheat">
+            <h1>정답 단어를 말함</h1>
+        </div>
+    {% endif %}   
     
 <audio controls>
         <source src="{{ url_for('audio') }}" type="audio/x-wav;codec=pcm">

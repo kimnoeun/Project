@@ -32,12 +32,12 @@ def genHeader(sampleRate, bitsPerSample, channels):
     return o
 
 
-#페이지 새로고침때마다 말끝날때까지 음성 입력 받아서 웹 화면에 띄우기 
+
 @app.route('/')
 def index():  
     return render_template('index2.html')
 
-
+#뭐라 말했는지 음성인식
 @app.route('/upload/')
 def uploaduj():
     transcript=""
@@ -50,11 +50,16 @@ def uploaduj():
         print('You said : {}'.format(transcript))
     except:
         print('Sorry could not recognize yur voice')           
-           
-    return render_template('index2.html', transcript=transcript)
+
+#특정 키워드를 말할 때 예를 들어 정답
+    cheat = 0
+    if transcript.find('정답') != -1 :
+        cheat=1
+
+    return render_template('index2.html', transcript=transcript, cheat=cheat)
 
 
-#이건 오류남...오디오 스트리밍 서버였는디
+#오디오 스트리밍 서버였는디
 @app.route('/audio')
 def audio():
     # start Recording
