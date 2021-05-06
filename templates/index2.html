@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<form action="/upload">
+    <label for="upload"> 말해 </label>
+    <input type="submit" value="입력">
+</form>
+
+
+    <h2> 내가 한 말 : {{ transcript }}  </h2>
+   
+    
+<audio controls>
+        <source src="{{ url_for('audio') }}" type="audio/x-wav;codec=pcm">
+        Your browser does not support the audio element.
+    </audio>
+
+</body>
+</html>
