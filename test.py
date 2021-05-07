@@ -1,8 +1,54 @@
-from flask import Flask, Response,render_template
+from flask import Flask, Response,render_template, Response
 import pyaudio
+import cv2
 import speech_recognition as sr
+import numpy as np
+import time
+import datetime
+import sys
 
+
+#faceCascade = cv2.CascadeClassifier("haarcascade_frontface.xml")
+num = 3
 app = Flask(__name__)
+
+camera = cv2.VideoCapture(0)  # use 0 for web camera
+
+
+@app.route('/')
+def index():
+    """Video streaming home page."""
+    now = datetime.datetime.now()
+    timeString = now.strftime("%Y-%m-%d %H:%M")
+    templateData = {
+            'title':'Image Streaming',
+            'time': timeString
+            }
+    return render_template('index2.html', **templateData)
+
+
+def gen_frames():  # generate frame by frame from camera
+    while True:
+        # Capture frame-by-frame
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            ret , buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
+
+@app.route('/video_feed')
+def video_feed():
+    #Video streaming route. Put this in the src attribute of an img tag
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+
+
 
 
 FORMAT = pyaudio.paInt16
@@ -31,11 +77,6 @@ def genHeader(sampleRate, bitsPerSample, channels):
     o += (datasize).to_bytes(4,'little')                                    # (4byte) Data size in bytes
     return o
 
-
-
-@app.route('/')
-def index():  
-    return render_template('index2.html')
 
 #뭐라 말했는지 음성인식
 @app.route('/upload/')
