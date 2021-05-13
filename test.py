@@ -83,7 +83,6 @@ def gen_frames():
             text = "Looking center"
 
         cv2.putText(image, text, (10,65), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 0, 0), 2)
-        cv2.imshow("Demo", image)
 
 
 
