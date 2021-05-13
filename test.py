@@ -10,12 +10,11 @@ import os
 
 
 
-
-
-#faceCascade = cv2.CascadeClassifier("haarcascade_frontface.xml")
+faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + "./haarcascade_frontalface_default.xml") # 얼굴찾기 haar 파일
+#eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades +"./haarcascade_eye.xml") # 눈찾기 haar 파일
+ 
 num = 3
 app = Flask(__name__)
-
 camera = cv2.VideoCapture(0)  # use 0 for web camera
 
 
@@ -31,17 +30,37 @@ def index():
     return render_template('index2.html', **templateData)
 
 
-def gen_frames():  # generate frame by frame from camera
+def gen_frames():
+    camera = cv2.VideoCapture(0)
+    time.sleep(0.2)
+    lastTime = time.time()*1000.0
+
     while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-        if not success:
+        ret, image = camera.read()
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+       
+        faces = faceCascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+        delt = time.time()*1000.0-lastTime
+        s = str(int(delt))
+        #print (delt," Found {0} faces!".format(len(faces)) )
+        lastTime = time.time()*1000.0
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.circle(image, (int(x+w/2), int(y+h/2)), int((w+h)/3), (255, 255, 255), 3)
+            cv2.putText(image, s, (10, 25),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        now = datetime.datetime.now()
+        timeString = now.strftime("%Y-%m-%d %H:%M")
+        cv2.putText(image, timeString, (10, 45),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+        #cv2.imshow("Frame", image)
+        key = cv2.waitKey(1) & 0xFF
+     # if the `q` key was pressed, break from the loop
+        if key == ord("q"):
             break
-        else:
-            ret , buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+   
+        ret, buffer = cv2.imencode('.jpg', image)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
 @app.route('/video_feed')
@@ -137,4 +156,4 @@ def audio():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='127.0.0.1', debug=True)
