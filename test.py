@@ -1,4 +1,7 @@
+from __future__ import division
 from flask import Flask, Response,render_template, Response
+from eye import Eye
+from calibration import Calibration
 import pyaudio
 import cv2
 import speech_recognition as sr
@@ -7,6 +10,9 @@ import time
 import datetime
 import sys
 import os
+import dlib
+from gaze_tracking import GazeTracking
+
 
 
 
@@ -29,30 +35,61 @@ def index():
             }
     return render_template('index2.html', **templateData)
 
-
+#안면인식
 def gen_frames():
     camera = cv2.VideoCapture(0)
     time.sleep(0.2)
     lastTime = time.time()*1000.0
 
+
+#시선추적
+    gaze = GazeTracking()
+
+
     while True:
+
         ret, image = camera.read()
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
        
         faces = faceCascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+
         delt = time.time()*1000.0-lastTime
         s = str(int(delt))
         #print (delt," Found {0} faces!".format(len(faces)) )
         lastTime = time.time()*1000.0
+
         # Draw a rectangle around the faces
         for (x, y, w, h) in faces:
             cv2.circle(image, (int(x+w/2), int(y+h/2)), int((w+h)/3), (255, 255, 255), 3)
             cv2.putText(image, s, (10, 25),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
         now = datetime.datetime.now()
         timeString = now.strftime("%Y-%m-%d %H:%M")
         cv2.putText(image, timeString, (10, 45),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
         #cv2.imshow("Frame", image)
+
+
+        #시선추적
+        gaze.refresh(image)
+        image = gaze.annotated_frame()
+
+        text = ""
+
+        if gaze.is_right():
+            text = "Looking right"
+        elif gaze.is_left():
+            text = "Looking left"
+        elif gaze.is_center():
+            text = "Looking center"
+
+        cv2.putText(image, text, (10,65), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 0, 0), 2)
+        cv2.imshow("Demo", image)
+
+
+
         key = cv2.waitKey(1) & 0xFF
+
+
      # if the `q` key was pressed, break from the loop
         if key == ord("q"):
             break
@@ -61,6 +98,8 @@ def gen_frames():
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
 
 
 @app.route('/video_feed')
