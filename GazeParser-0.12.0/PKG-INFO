@@ -1,0 +1,29 @@
+Metadata-Version: 1.1
+Name: GazeParser
+Version: 0.12.0
+Summary: Gaze tracking, parsing and visualization tools
+Home-page: http://sourceforge.net/p/gazeparser/
+Author: Hiroyuki Sogo
+Author-email: hsogo12600@gmail.com
+License: GNU GPL
+Description: 
+        The GazeParser is a package for eye movement research. 
+        For recording, this package provides a module to control SimpleGazeTracker, 
+        an open-source video-based eye-tracking application, from VisionEgg and PsychoPy.
+        For data analysis, this package provides various  functions such as detecting
+        saccades and fixations, plotting and comparing scan paths, calculating saccade
+        trajectory curvature and so on.
+        
+        See http://sourceforge.net/p/gazeparser/ for detail.
+        
+Keywords: gaze tracking,eye tracking,eye movement
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering
