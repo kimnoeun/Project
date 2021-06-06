@@ -42,10 +42,6 @@ def gen_frames():
     lastTime = time.time()*1000.0
 
 
-#시선추적
-    gaze = GazeTracking()
-
-
     while True:
 
         ret, image = camera.read()
@@ -70,6 +66,7 @@ def gen_frames():
 
 
         #시선추적
+        gaze = GazeTracking()
         gaze.refresh(image)
         image = gaze.annotated_frame()
 
@@ -164,7 +161,7 @@ def uploaduj():
 
 
 
-#오디오 스트리밍 서버였는디
+#오디오 스트리밍 서버
 @app.route('/audio')
 def audio():
     # start Recording
